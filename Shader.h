@@ -15,7 +15,11 @@ public:
 	GLuint m_shader;
 	GLuint m_program;
 	GLuint m_positionLocation;
+	GLuint m_colourLocation;
+	GLuint m_modelTransformLocation;
+	GLuint m_textureCoord;
 	GLuint m_offsetLocation;
+	
 
 
 	Shader(string shaderPath);

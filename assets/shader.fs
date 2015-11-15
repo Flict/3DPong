@@ -1,8 +1,13 @@
 #version 330
 
+in vec4 Color;
+in vec2 TexCoord;
+
 out vec4 outputColor;
+
+uniform sampler2D tex;
 
 void main()
 {
-	outputColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	outputColor = texture(tex, TexCoord) * Color;
 }

@@ -21,6 +21,9 @@ Shader::Shader(string shaderPath)
 	}
 
 	m_positionLocation = glGetAttribLocation(m_program, "position");
+	m_colourLocation = glGetAttribLocation(m_program, "color");
+	m_textureCoord = glGetAttribLocation(m_program, "texCoord");
+	m_modelTransformLocation = glGetUniformLocation(m_program, "transform");
 	m_offsetLocation = glGetUniformLocation(m_program, "offset");
 	//clean up shaders (we don't need them anymore as they are no in theProgram
 	for_each(shaderList.begin(), shaderList.end(), glDeleteShader);

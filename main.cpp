@@ -5,26 +5,36 @@
 #include <string>
 #include <GL/glew.h>
 #include <SDL.h>
+#include <glm\glm.hpp>
 #include "Shader.h"
 #include "Display.h"
 #include "Mesh.h"
+#include "Texture.h"
+#include "Transform.h"
+#include "Camera.h"
 
 using namespace std;
 
-std::string path = "./assets/shader";
+std::string path = "./assets/shader"; // Path to shaders
+std::string texturePath = "./assets/bricks.bmp"; // Path to brick texture
 
 const float vertexPositions1[] = {
-	0.0f, 0.5f, 0.0f, 1.0f, // Top
-	-0.5f, -0.5f, 0.0f, 1.0f, // Left
-	0.5f, -0.5f, 0.0f, 1.0f, // Right
+	0.0f, 0.5f, 0.0f, 1.0f,		1.0f, 0.0f, 0.0f, 1.0f,		0.0f, 0.0f, // Top
+	-0.5f, -0.5f, 0.0f, 1.0f,	0.0f, 1.0f, 0.0f, 1.0f,		1.0f, 0.0f,// Left
+	0.5f, -0.5f, 0.0f, 1.0f,	0.0f, 0.0f, 1.0f, 1.0f,		0.0f, 1.0f// Right
 };
 
 int main( int argc, char* args[] )
 {
 
 	Display display(800, 600, "Hello World!");
-	Shader shader(path); //  Shader
 	Mesh mesh(vertexPositions1, sizeof(vertexPositions1));
+	Shader shader(path); //  Shader
+	Texture texture(texturePath); // Create a texture
+	Transform transform; // Transformations
+	Camera camera(glm::vec3(0.f, 0.f, -3.f), 70.f, (float)800.f / (float)600.f, 0.1f, 100.0f);
+
+	float value = 0.0f;
 	
 
 	while (!display.IsWindowClosed()) /// While the window is open
@@ -32,9 +42,15 @@ int main( int argc, char* args[] )
 		display.Clear(0.0f, 0.0f, 1.0f, 1.0f);
 		float deltaTime = SDL_GetTicks() / 10000.f; // Not really Delta Time
 
-		mesh.Render(shader); // Draw the mesh				 
+		transform.GetPos().x = sinf(value);
+		transform.GetRot().z = value;
+		transform.SetScale(glm::vec3(cosf(value), cosf(value), cosf(value)));
+
+		value += 0.01f;
+		texture.Bind();
+		mesh.Render(shader, transform, camera); // Draw the mesh
 							 
-		//mesh.UpdateSimulation(deltaTime);
+		mesh.UpdateSimulation(deltaTime);
 		display.Update(); // Update the display
 	}
 

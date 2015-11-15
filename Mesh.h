@@ -1,7 +1,11 @@
 #pragma once
 #include <GL/glew.h>
 #include <iostream>
+#include <glm\glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include "Shader.h"
+#include "Transform.h"
+#include "Camera.h"
 
 using namespace std;
 
@@ -13,7 +17,7 @@ public:
 	virtual ~Mesh();
 	void InitializeVertexBuffer();
 	void LoadAssets();
-	void Render(Shader shader);
+	void Render(Shader shader, Transform transform, Camera camera);
 	void UpdateSimulation(double simLength);
 
 	GLfloat m_vertexPositions[1000];

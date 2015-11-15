@@ -38,24 +38,33 @@ void Mesh::LoadAssets()
 	cout << "Loaded Assets OK!\n";
 }
 
-void Mesh::Render(Shader shader)
+void Mesh::Render(Shader shader, Transform transform, Camera camera)
 {
 	glUseProgram(shader.m_program); //installs the program object specified by program as part of current rendering state
 
 									 //load data to GLSL that **may** have changed
 	//glUniform2f(shader.m_offsetLocation, m_offsetX, m_offsetY);
 
+	glm::mat4 modelViewMatrix = /*camera.GetViewProjection() TODO: FIX CAMERA*/ transform.GetModel();
+	glUniformMatrix4fv(shader.m_modelTransformLocation, 1, GL_FALSE, &modelViewMatrix[0][0]);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_positionBufferObject); //bind positionBufferObject
 
-	glEnableVertexAttribArray(shader.m_positionLocation); //this 0 corresponds to the location = 0 in the GLSL for the vertex shader.
-														   //more generically, use glGetAttribLocation() after GLSL linking to obtain the assigned attribute location.
+	glEnableVertexAttribArray(shader.m_positionLocation); // Enable the attribute to use for positioning
+	glEnableVertexAttribArray(shader.m_colourLocation); // Enable the attribute to use for colour
+	glEnableVertexAttribArray(shader.m_textureCoord); // Enable the attribute to use for colour
+														   
 
-	glVertexAttribPointer(shader.m_positionLocation, 4, GL_FLOAT, GL_FALSE, 0, 0); //define **how** values are reader from positionBufferObject in Attrib 0
+	glVertexAttribPointer(shader.m_positionLocation, 4, GL_FLOAT, GL_FALSE, 10 * sizeof(float), 0); //define **how** values are reader from positionBufferObject in Attrib 0
+	glVertexAttribPointer(shader.m_colourLocation, 4, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)(4 * sizeof(float))); //define **how** values are reader from positionBufferObject in Attrib 0
+	glVertexAttribPointer(shader.m_textureCoord, 2, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)(8 * sizeof(float))); //define **how** values are reader from positionBufferObject in Attrib 0
 
-	glDrawArrays(GL_TRIANGLES, 0, 3); //Draw something, using Triangles, and 3 vertices - i.e. one lonely triangle
 
-	glDisableVertexAttribArray(0); //cleanup
+	glDrawArrays(GL_TRIANGLES, 0, sizeof(m_vertexPositions) / 10); //Draw something, using Triangles, and 3 vertices - i.e. one lonely triangle
+
+	glDisableVertexAttribArray(shader.m_positionLocation); //cleanup
+	glDisableVertexAttribArray(shader.m_colourLocation); //cleanup
+	glDisableVertexAttribArray(shader.m_textureCoord); //cleanup
 	glUseProgram(0); //clean up
 
 }
