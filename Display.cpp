@@ -29,6 +29,13 @@ Display::Display(GLint width, GLint height, const std::string& title)
 
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
+
+	for (int i = 0; i < 322; i++)
+	{
+		KEYS[i] = false; // Initialise all keys to false
+	}
+	//SDL_EnableKeyRepeat()
+	//SDL_SetRelativeMouseMode(SDL_TRUE);
 }
 
 Display::~Display()
@@ -43,8 +50,8 @@ void Display::Clear(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
 	glClearColor(r, g, b, a); // Fill the display with colour
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the colour buffer so we can fill it with the display colour
 }
-
-void Display::Update()
+float rot = 0.1f, pitch = 0.1f;
+void Display::Update(float deltaTime, Camera& camera)
 {
 	SDL_GL_SwapWindow(m_window); // Swap the window buffers
 
@@ -52,8 +59,49 @@ void Display::Update()
 
 	while (SDL_PollEvent(&e)) // 
 	{
-		if (e.type == SDL_QUIT) // SDL window has been quit
+		switch (e.type)
+
+		{
+		case SDL_QUIT:
 			m_isWindowClosed = true; // Set that the window is closed
+			break;
+		case SDL_KEYDOWN:
+			//KEYS[e.key.keysym.sym] = true; // Set key is down
+			switch (e.key.keysym.sym)
+			{
+			case SDLK_w:
+				camera.MoveForward(deltaTime * 0.1f);
+				break;
+			case SDLK_s:
+				camera.MoveForward(deltaTime * -0.1f);
+				break;
+			case SDLK_a:
+				camera.MoveRight(deltaTime * 0.1f);
+				break;
+			case SDLK_d:
+				camera.MoveRight(deltaTime * -0.1f);
+				break;
+			case SDLK_UP:
+				camera.Pitch(pitch);
+				break;
+			case SDLK_DOWN:
+				camera.Pitch(-pitch);
+				break;
+			case SDLK_LEFT:
+				camera.RotateY(pitch);
+				break;
+			case SDLK_RIGHT:
+				camera.RotateY(-pitch);
+				break;
+			}
+			break;
+			
+		case SDL_KEYUP:
+			//KEYS[e.key.keysym.sym] = false; // Set key is up
+			break;
+		}
+
+
 	}
 }
 

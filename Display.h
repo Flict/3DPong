@@ -5,13 +5,17 @@
 #include <GL/glew.h>
 #include <iostream>
 
+#include "Camera.h"
+
+using namespace std;
+
 class Display
 {
 public:
 	Display(GLint width, GLint height, const std::string& title);
 
 	void Clear(GLfloat r, GLfloat g, GLfloat b, GLfloat a);
-	void Update(); // Swaps between the window buffers to update the display
+	void Update(float deltaTime, Camera& camera); // Swaps between the window buffers to update the display
 	bool IsWindowClosed(); // Returns whether or not the window is closed
 
 	virtual ~Display();
@@ -22,6 +26,8 @@ private:
 	SDL_Window* m_window;
 	SDL_GLContext m_glContext; // OpenGL Context for use with drawing in the Window
 	bool m_isWindowClosed;
+
+	bool KEYS[322]; // Keyboard handling
 };
 
 //#include <SDL.h>
