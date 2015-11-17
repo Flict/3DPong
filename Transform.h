@@ -25,14 +25,6 @@ public:
 		return posMatrix * rotMatrix * scaleMatrix;
 	}
 
-	//inline glm::mat4 GetMVP(const Camera& camera) const
-	//{
-	//	glm::mat4 VP = camera.GetViewProjection();
-	//	glm::mat4 M = GetModel();
-
-	//	return VP * M;//camera.GetViewProjection() * GetModel();
-	//}
-
 	inline glm::vec3& GetPos() { return m_pos; }
 	inline glm::vec3& GetRot() { return m_rot; }
 	inline glm::vec3& GetScale() { return m_scale; }

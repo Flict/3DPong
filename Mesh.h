@@ -20,7 +20,7 @@ public:
 	void InitializeVertexBuffer();
 	void LoadAssets();
 	void Render(Shader shader, Transform transform, Camera camera);
-	void UpdateSimulation(double simLength);
+	void Update(double deltaTime);
 
 	GLfloat m_vertexPositions[1000];
 	GLuint m_indicesPositions[1000];

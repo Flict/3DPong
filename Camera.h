@@ -5,12 +5,20 @@
 struct Camera
 {
 public:
-	Camera(const glm::vec3& pos, float fov, float aspect, float zNear, float zFar)
+	Camera(const glm::vec3& pos, float fov, float aspect, float zNear, float zFar) // Perspective Camera
 	{
 		this->m_pos = pos;
 		this->m_forward = glm::vec3(0.0f, 0.0f, -1.0f);
 		this->m_up = glm::vec3(0.0f, 1.0f, 0.0f);
 		this->m_projection = glm::perspective(fov, aspect, zNear, zFar);
+	}
+
+	Camera(const glm::vec3& pos, float left, float right, float bottom, float top, float zNear, float zFar) // Ortho Camera
+	{
+		this->m_pos = pos;
+		this->m_forward = glm::vec3(0.0f, 0.0f, -1.0f);
+		this->m_up = glm::vec3(0.0f, 1.0f, 0.0f);
+		this->m_projection = glm::ortho(left, right, bottom, top, zNear, zFar);
 	}
 
 	inline glm::mat4 GetViewProjection() const

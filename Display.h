@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "Camera.h"
+#include "Transform.h"
 
 using namespace std;
 
@@ -15,9 +16,10 @@ public:
 	Display(GLint width, GLint height, const std::string& title);
 
 	void Clear(GLfloat r, GLfloat g, GLfloat b, GLfloat a);
-	void Update(float deltaTime, Camera& camera); // Swaps between the window buffers to update the display
+	void Update(float deltaTime, Camera& camera, Transform& paddle1, Transform& paddle2, Transform& ball); // Swaps between the window buffers to update the display
 	bool IsWindowClosed(); // Returns whether or not the window is closed
-
+	
+	bool m_perspective = false; // Whether the camera is perspective
 	virtual ~Display();
 private:
 	void operator=(const Display& display) {}

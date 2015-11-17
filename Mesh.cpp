@@ -86,8 +86,8 @@ void Mesh::Render(Shader shader, Transform transform, Camera camera)
 
 }
 
-void Mesh::UpdateSimulation(double simLength) //update simulation with an amount of time to simulate for (in seconds)
+void Mesh::Update(double deltaTime) //update simulation with an amount of time to simulate for (in seconds)
 {
-	m_offsetX += m_offsetXSpeed * simLength;
-	m_offsetY += m_offsetYSpeed * simLength;
+	m_offsetX += m_offsetXSpeed * deltaTime;
+	m_offsetY += m_offsetYSpeed * deltaTime;
 }

@@ -51,7 +51,7 @@ void Display::Clear(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the colour buffer so we can fill it with the display colour
 }
 float rot = 0.1f, pitch = 0.1f;
-void Display::Update(float deltaTime, Camera& camera)
+void Display::Update(float deltaTime, Camera& camera, Transform& paddle1, Transform& paddle2, Transform& ball)
 {
 	SDL_GL_SwapWindow(m_window); // Swap the window buffers
 
@@ -70,28 +70,35 @@ void Display::Update(float deltaTime, Camera& camera)
 			switch (e.key.keysym.sym)
 			{
 			case SDLK_w:
-				camera.MoveForward(deltaTime * 0.1f);
+				paddle1.GetPos().y += deltaTime * 30.f;
+				//camera.MoveForward(deltaTime * 0.1f);
 				break;
 			case SDLK_s:
-				camera.MoveForward(deltaTime * -0.1f);
+				paddle1.GetPos().y -= deltaTime * 30.f;
+				//camera.MoveForward(deltaTime * -0.1f);
 				break;
 			case SDLK_a:
-				camera.MoveRight(deltaTime * 0.1f);
+				//camera.MoveRight(deltaTime * 0.1f);
 				break;
 			case SDLK_d:
-				camera.MoveRight(deltaTime * -0.1f);
+				//camera.MoveRight(deltaTime * -0.1f);
 				break;
 			case SDLK_UP:
-				camera.Pitch(pitch);
+				paddle2.GetPos().y += deltaTime * 30.f;
+				//camera.Pitch(pitch);
 				break;
 			case SDLK_DOWN:
-				camera.Pitch(-pitch);
+				paddle2.GetPos().y -= deltaTime * 30.f;
+			//	camera.Pitch(-pitch);
 				break;
 			case SDLK_LEFT:
-				camera.RotateY(pitch);
+				//camera.RotateY(pitch);
 				break;
 			case SDLK_RIGHT:
-				camera.RotateY(-pitch);
+				//camera.RotateY(-pitch);
+				break;
+			case SDLK_F1:
+				m_perspective = !m_perspective; // Switch between mode value
 				break;
 			}
 			break;
