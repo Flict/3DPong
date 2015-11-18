@@ -9,7 +9,13 @@
 #include "Transform.h"
 
 using namespace std;
-
+enum CameraViewPorts // Current viewport for camera
+{
+	STANDARD,
+	FOLLOWBALL,
+	PADDLE1,
+	PADDLE2
+};
 class Display
 {
 public:
@@ -20,8 +26,10 @@ public:
 	bool IsWindowClosed(); // Returns whether or not the window is closed
 	
 	bool m_perspective = false; // Whether the camera is perspective
+	bool m_cameraMode = false; // Whether the camera should be controlled or static. False is paddle control and true is Camera control
 	virtual ~Display();
-private:
+
+	CameraViewPorts m_viewPort = STANDARD;
 	void operator=(const Display& display) {}
 	Display(const Display& display) {}
 
@@ -30,6 +38,8 @@ private:
 	bool m_isWindowClosed;
 
 	bool KEYS[322]; // Keyboard handling
+
+	
 };
 
 //#include <SDL.h>

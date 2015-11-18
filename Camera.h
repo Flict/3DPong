@@ -5,12 +5,17 @@
 struct Camera
 {
 public:
+	glm::vec3 m_pos;
+	glm::vec3 m_forward; // Direction the camera is looking
+	glm::mat4 m_view;
+	glm::vec3 m_up; // Which direction is up
 	Camera(const glm::vec3& pos, float fov, float aspect, float zNear, float zFar) // Perspective Camera
 	{
 		this->m_pos = pos;
 		this->m_forward = glm::vec3(0.0f, 0.0f, -1.0f);
 		this->m_up = glm::vec3(0.0f, 1.0f, 0.0f);
 		this->m_projection = glm::perspective(fov, aspect, zNear, zFar);
+		m_view = glm::lookAt(m_pos, m_pos + m_forward, m_up);
 	}
 
 	Camera(const glm::vec3& pos, float left, float right, float bottom, float top, float zNear, float zFar) // Ortho Camera
@@ -19,11 +24,17 @@ public:
 		this->m_forward = glm::vec3(0.0f, 0.0f, -1.0f);
 		this->m_up = glm::vec3(0.0f, 1.0f, 0.0f);
 		this->m_projection = glm::ortho(left, right, bottom, top, zNear, zFar);
+		m_view = glm::lookAt(m_pos, m_pos + m_forward, m_up);
 	}
 
-	inline glm::mat4 GetViewProjection() const
+	inline glm::mat4 GetProjection() const
 	{
-		return m_projection * glm::lookAt(m_pos, m_pos + m_forward, m_up);
+		return m_projection;
+	}
+
+	inline glm::mat4 GetView()
+	{
+		return m_view;
 	}
 
 	void MoveForward(float amount)
@@ -54,10 +65,13 @@ public:
 		m_up = glm::vec3(glm::normalize(rotation * glm::vec4(m_up, 0.0)));
 	}
 
+	void Update()
+	{
+		m_view = glm::lookAt(m_pos, m_pos + m_forward, m_up);
+	}
+
 protected:
 private:
 	glm::mat4 m_projection;
-	glm::vec3 m_pos;
-	glm::vec3 m_forward; // Direction the camera is looking
-	glm::vec3 m_up; // Which direction is up
+
 };

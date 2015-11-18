@@ -5,6 +5,11 @@ Mesh::Mesh(const std::string fileName)
 
 }
 
+Mesh::Mesh()
+{
+
+}
+
 Mesh::Mesh(const float vertexPositions[], GLint size, const unsigned int indices[], GLint numIndices)
 {
 	for (int i = 0; i < size; i++)
@@ -54,14 +59,17 @@ void Mesh::LoadAssets()
 	cout << "Loaded Assets OK!\n";
 }
 
-void Mesh::Render(Shader shader, Transform transform, Camera camera)
+void Mesh::Render(Shader shader, Transform transform, Camera camera, bool cullBack)
 {
+	if (cullBack)
+		glCullFace(GL_BACK);
+	else
+		glCullFace(GL_FRONT);
 	glUseProgram(shader.m_program); //installs the program object specified by program as part of current rendering state
 
 									 //load data to GLSL that **may** have changed
 	//glUniform2f(shader.m_offsetLocation, m_offsetX, m_offsetY);
-
-	glm::mat4 modelViewMatrix = camera.GetViewProjection() * transform.GetModel();
+	glm::mat4 modelViewMatrix = camera.GetProjection() * camera.GetView() * transform.GetModel();
 	glUniformMatrix4fv(shader.m_modelTransformLocation, 1, GL_FALSE, &modelViewMatrix[0][0]);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_positionBufferObject); //bind positionBufferObject

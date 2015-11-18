@@ -12,14 +12,17 @@
 #include "Texture.h"
 #include "Transform.h"
 #include "Camera.h"
+#include <time.h>
 
 using namespace std;
 
 std::string path = "./assets/shader"; // Path to shaders
 std::string texturePath = "./assets/bricks.bmp"; // Path to brick texture
-std::string texturePath2 = "./assets/white-texture.bmp"; // Path to white texture
+std::string texturePath2 = "./assets/green-texture.bmp"; // Path to green texture
 std::string texturePath3 = "./assets/background.bmp"; // Path to background texture
 std::string texturePath4 = "./assets/sparks.bmp"; // Path to sparks texture
+std::string texturePath5 = "./assets/sky.bmp"; // Path to sky texture
+std::string texturePath6 = "./assets/smiley.bmp"; // Path to sky texture
 
 const float vertexPositions1[] = {
 	// Front Face
@@ -100,28 +103,40 @@ void HandleInput(float deltaTime, Camera camera)
 
 int main( int argc, char* args[] )
 {
+	srand(time(NULL));
 
 	Display display(800, 600, "Hello World!");
 	Mesh paddle2(vertexPositions1, sizeof(vertexPositions1), indicesPositions, sizeof(indicesPositions));
 	Mesh paddle1(vertexPositions1, sizeof(vertexPositions1), indicesPositions, sizeof(indicesPositions));
 	Mesh ball(vertexPositions1, sizeof(vertexPositions1), indicesPositions, sizeof(indicesPositions));
 	Mesh background(vertexPositions1, sizeof(vertexPositions1), indicesPositions, sizeof(indicesPositions));
+	Mesh pointBlock(vertexPositions1, sizeof(vertexPositions1), indicesPositions, sizeof(indicesPositions));
+	Mesh skyBox(vertexPositions1, sizeof(vertexPositions1), indicesPositions, sizeof(indicesPositions));
 
 	Shader shader(path); //  Shader
 	Texture texture(texturePath); // Create a texture
 	Texture texture2(texturePath2); // Create a texture
 	Texture texture3(texturePath3); // Create a texture
 	Texture texture4(texturePath4); // Create a texture
+	Texture texture5(texturePath5); // Create a texture
+	Texture texture6(texturePath6); // Create a texture
 	Transform paddle1Transform; // , Transformations
 	Transform paddle2Transform; // , Transformations
 	Transform ballTransform;
 	Transform backgroundTransform;
-	Camera perspectiveCamera(glm::vec3(0.f, 0.f, 2.f), 70.f, (float)800.f / (float)600.f, 0.1f, 100.0f);
-	Camera orthographicCamera(glm::vec3(0.f, 0.f, 3.f), -1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 1000.0f);
+	Transform pointBlockTransform;
+	Transform skyBoxTransform;
+	Camera perspectiveCamera(glm::vec3(0.f, 0.f, 2.f), 70.f, (float)800.f / (float)600.f, 0.1f, 10000.0f);
+	Camera orthographicCamera(glm::vec3(0.f, 0.f, 3.f), -1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 100.0f);
 
 	Camera renderCamera = orthographicCamera; // Camera used in the scene
 	
+	GLint player1Points = 0;
+	GLint player2Points = 0;
 	float value = 0.0f;
+
+	pointBlockTransform.SetPos(glm::vec3(-0.96,0.95f, 0.f));
+	pointBlockTransform.SetScale(glm::vec3(0.04f, 0.04f, 0.04f));
 
 	backgroundTransform.GetPos().z = -3.0f;
 	backgroundTransform.SetScale(glm::vec3(5.0f, 4.8f, 1.0f));
@@ -130,37 +145,58 @@ int main( int argc, char* args[] )
 	paddle1Transform.GetPos().x = -0.9f;
 	ballTransform.GetPos().x = -0.8f;
 
+	skyBoxTransform.GetScale() *= 10000;
+
 	float ballSpeed = 15.f;
 	glm::vec3 ballVelocity(ballSpeed, -ballSpeed, 0.0f); // Set the initial velocity
 
 	paddle1Transform.SetScale(glm::vec3(.05f, .3f, .1f));
 	paddle2Transform.SetScale(glm::vec3(.05f, .3f, .1f));
 	ballTransform.SetScale(glm::vec3(.05f, .075f, .075f));
+	
 
 	double lastElapsedTime = SDL_GetTicks() - 1, deltaTime = 0.0f;
 	while (!display.IsWindowClosed()) /// While the window is open
 	{
+		GLint randomNo = rand() % 2 + 1;
 		display.Clear(0.0f, 0.0f, 0.0f, 0.0f);
 		// Calculate deltaTime from how long it took between frames
 		double elapsedTime = SDL_GetTicks();
 		deltaTime = (elapsedTime / lastElapsedTime) / 1000.0f;
 		lastElapsedTime = elapsedTime;
-
 		//cout << deltaTime << endl;
 		if ((ballTransform.GetPos().x) > 1) // Point for player1
 		{
 			ballTransform.GetPos().x = 0.8f;
 			ballTransform.GetPos().y = paddle2Transform.GetPos().y;
 			ballVelocity.x = -ballVelocity.x;
+			player1Points++; // Increase points
 			cout << "Player 1 Point" << endl;
+
+			if (player1Points == 20)
+			{
+				player1Points = 0;
+				player2Points = 0;
+				cout << "Player 2 wins" << endl;
+			}
 		}
 		else if (ballTransform.GetPos().x < -1) // Point for player2
 		{
 			ballTransform.GetPos().x = -0.8f;
 			ballTransform.GetPos().y = paddle1Transform.GetPos().y;
 			ballVelocity.x = -ballVelocity.x;
+			player2Points++; // Increase points
 			cout << "Player 2 Point" << endl;
+
+			if (player2Points == 20)
+			{
+				player2Points = 0;
+				player1Points = 0;
+				cout << "Player 2 wins" << endl;
+			}
+				
 		}
+
 
 		background.Render(shader, paddle1Transform, renderCamera);
 		
@@ -173,21 +209,39 @@ int main( int argc, char* args[] )
 		if (display.m_perspective) // perspective projection
 		{
 			display.Clear(0.0f, 0.0f, 0.0f, 0.0f);
+			ballTransform.GetRot().z += 200 * deltaTime;
+			texture5.Bind();
+			skyBox.Render(shader, skyBoxTransform, renderCamera, false);
+			glBindTexture(GL_TEXTURE_2D, 0); // No texture
+			if (!display.m_cameraMode)
 			renderCamera = perspectiveCamera;
+
+			if (display.m_viewPort == FOLLOWBALL)
+				renderCamera.m_view = glm::lookAt(ballTransform.GetPos() - glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, -10.f) + renderCamera.m_forward, renderCamera.m_up);
+				
+			else if (display.m_viewPort == PADDLE1)
+				renderCamera.m_view = glm::lookAt(paddle1Transform.GetPos() - glm::vec3(-0.001f, 0.f, 0.f), paddle1Transform.GetPos() - glm::vec3(-0.002f, 0.f, 0.f), renderCamera.m_up);
+			else if (display.m_viewPort == PADDLE2)
+				renderCamera.m_view = glm::lookAt(paddle2Transform.GetPos() - glm::vec3(0.001f, 0.f, 0.f), paddle2Transform.GetPos() - glm::vec3(0.002f, 0.f, 0.f), renderCamera.m_up);
 			texture3.Bind();
 			background.Render(shader, backgroundTransform, renderCamera);
 			glBindTexture(GL_TEXTURE_2D, 0); // No texture
 			texture.Bind();
 			paddle1.Render(shader, paddle1Transform, renderCamera); // Draw the mesh
+			glBindTexture(GL_TEXTURE_2D, 0); // No texture
+			texture6.Bind();
 			paddle2.Render(shader, paddle2Transform, renderCamera); // Draw second mesh
 			glBindTexture(GL_TEXTURE_2D, 0); // No texture
 			texture4.Bind();
 			ball.Render(shader, ballTransform, renderCamera);
 			glBindTexture(GL_TEXTURE_2D, 0); // No texture
+			texture2.Bind();
 		}
 		else // orthographic projection
 		{
 			display.Clear(1.0f, 1.0f, 1.0f, 1.0f);
+			ballTransform.GetRot().z = 0.f;
+			if (!display.m_cameraMode)
 			renderCamera = orthographicCamera;
 			glBindTexture(GL_TEXTURE_2D, 0); // No texture
 			paddle1.Render(shader, paddle1Transform, renderCamera); // Draw the mesh
@@ -197,15 +251,65 @@ int main( int argc, char* args[] )
 		}
 
 		
-		if (ballTransform.GetPos().y <= paddle2Transform.GetPos().y + 0.1 && ballTransform.GetPos().y > paddle2Transform.GetPos().y - 0.1 && ballTransform.GetPos().x >= paddle2Transform.GetPos().x - 0.05)
-			ballVelocity = -ballVelocity;
-		else if (ballTransform.GetPos().y <= paddle1Transform.GetPos().y + 0.1 && ballTransform.GetPos().y > paddle1Transform.GetPos().y - 0.1 && ballTransform.GetPos().x <= paddle1Transform.GetPos().x + 0.05 && ballTransform.GetPos().x >paddle1Transform.GetPos().x - 0.05)
-			ballVelocity = -ballVelocity;
-			//paddle1Transform.GetRot().z = value;
+		pointBlockTransform.SetRot(glm::vec3(sinf(value), sinf(value), sinf(value)));
 
-		value += 0.01f;
+		for (int i = 0; i < player1Points; i++)
+		{
+			Transform temp(pointBlockTransform);
+			temp.GetPos().y = pointBlockTransform.GetPos().y - (i * 0.1f);
+			pointBlock.Render(shader, temp, orthographicCamera);
+		}
+
+		for (int i = 0; i < player2Points; i++)
+		{
+			Transform temp(pointBlockTransform);
+			temp.GetPos().x = -temp.GetPos().x;
+			temp.GetPos().y = pointBlockTransform.GetPos().y - (i * 0.1f);
+			pointBlock.Render(shader, temp, orthographicCamera);
+		}
 		
+		glBindTexture(GL_TEXTURE_2D, 0); // No texture
+		
+		// Ball collision with bats
+		if (ballTransform.GetPos().y <= paddle2Transform.GetPos().y + 0.1 && ballTransform.GetPos().y > paddle2Transform.GetPos().y - 0.1 && ballTransform.GetPos().x >= paddle2Transform.GetPos().x - 0.05)
+		{
+			
+			ballVelocity = -ballVelocity;
+
+			if (randomNo == 1)
+				ballVelocity.y = ballSpeed;
+			else
+				ballVelocity.y = -ballSpeed;
+			
+			
+		}
+		
+		else if (ballTransform.GetPos().y <= paddle1Transform.GetPos().y + 0.1 && ballTransform.GetPos().y > paddle1Transform.GetPos().y - 0.1 && ballTransform.GetPos().x <= paddle1Transform.GetPos().x + 0.05 && ballTransform.GetPos().x > paddle1Transform.GetPos().x - 0.05)
+		{
+			ballVelocity = -ballVelocity;
+			if (randomNo == 1)
+				ballVelocity.y = ballSpeed;
+			else
+				ballVelocity.y = -ballSpeed;
+		}
+			
+			//paddle1Transform.GetRot().z = value;
+		//perspectiveCamera.m_pos = ballTransform.GetPos();
+		//perspectiveCamera.m_pos.z += 1.f;
+
+		/*perspectiveCamera.m_pos = paddle1Transform.GetPos();
+		perspectiveCamera.m_pos.x += 2.f;
+		perspectiveCamera.m_pos.z += 2.f;
+		perspectiveCamera.m_forward = glm::vec3(1.0f, 0.f, 1.f);*/
+
+		
+		//perspectiveCamera.m_pos.y += 1;
+		value += 0.01f;
+
+		renderCamera.Update();
 		display.Update(deltaTime, renderCamera, paddle1Transform, paddle2Transform, paddle1Transform); // Update the display
+		
+		
 	}
 
 

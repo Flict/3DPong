@@ -16,10 +16,11 @@ class Mesh
 public:
 	Mesh(const float vertexPositions[], GLint size, const unsigned int indices[], GLint numIndices);
 	Mesh(const std::string fileName);
+	Mesh(); // Default Constructor
 	virtual ~Mesh();
 	void InitializeVertexBuffer();
 	void LoadAssets();
-	void Render(Shader shader, Transform transform, Camera camera);
+	void Render(Shader shader, Transform transform, Camera camera, bool cullBack = true);
 	void Update(double deltaTime);
 
 	GLfloat m_vertexPositions[1000];

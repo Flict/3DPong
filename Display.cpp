@@ -28,7 +28,6 @@ Display::Display(GLint width, GLint height, const std::string& title)
 	glEnable(GL_DEPTH_TEST);
 
 	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
 
 	for (int i = 0; i < 322; i++)
 	{
@@ -60,7 +59,6 @@ void Display::Update(float deltaTime, Camera& camera, Transform& paddle1, Transf
 	while (SDL_PollEvent(&e)) // 
 	{
 		switch (e.type)
-
 		{
 		case SDL_QUIT:
 			m_isWindowClosed = true; // Set that the window is closed
@@ -70,35 +68,75 @@ void Display::Update(float deltaTime, Camera& camera, Transform& paddle1, Transf
 			switch (e.key.keysym.sym)
 			{
 			case SDLK_w:
-				paddle1.GetPos().y += deltaTime * 30.f;
-				//camera.MoveForward(deltaTime * 0.1f);
+				if (!m_cameraMode)
+				{
+					if (((paddle1.GetPos().y + 0.2f) + deltaTime * 30.f) <= 1)
+						paddle1.GetPos().y += deltaTime * 30.f;
+				}
+					
+				else
+					camera.MoveForward(deltaTime * 30.0f);
 				break;
 			case SDLK_s:
-				paddle1.GetPos().y -= deltaTime * 30.f;
-				//camera.MoveForward(deltaTime * -0.1f);
+				if (!m_cameraMode)
+				{
+					if (((paddle1.GetPos().y - 0.2f) - deltaTime * 30.f) >= -1)
+						paddle1.GetPos().y -= deltaTime * 30.f;
+				}
+				else
+					camera.MoveForward(deltaTime * -30.0f);
 				break;
 			case SDLK_a:
-				//camera.MoveRight(deltaTime * 0.1f);
+				if (m_cameraMode)
+				camera.MoveRight(deltaTime * 30.f);
 				break;
 			case SDLK_d:
-				//camera.MoveRight(deltaTime * -0.1f);
+				if (m_cameraMode)
+					camera.MoveRight(deltaTime * -30.f);
 				break;
 			case SDLK_UP:
-				paddle2.GetPos().y += deltaTime * 30.f;
-				//camera.Pitch(pitch);
+				if (!m_cameraMode)
+				{
+					if (((paddle2.GetPos().y + 0.2f) + deltaTime * 30.f) <= 1)
+						paddle2.GetPos().y += deltaTime * 30.f;
+				}
+				else
+				camera.Pitch(pitch);
 				break;
 			case SDLK_DOWN:
-				paddle2.GetPos().y -= deltaTime * 30.f;
-			//	camera.Pitch(-pitch);
+				if (!m_cameraMode)
+				{
+					if (((paddle2.GetPos().y - 0.2f) - deltaTime * 30.f) >= -1)
+						paddle2.GetPos().y -= deltaTime * 30.f;
+				}	
+				else
+					camera.Pitch(-pitch);
 				break;
 			case SDLK_LEFT:
-				//camera.RotateY(pitch);
+				if (m_cameraMode)
+				camera.RotateY(pitch);
 				break;
 			case SDLK_RIGHT:
-				//camera.RotateY(-pitch);
+				if (m_cameraMode)
+				camera.RotateY(-pitch);
 				break;
 			case SDLK_F1:
 				m_perspective = !m_perspective; // Switch between mode value
+				break;
+			case SDLK_F2:
+				m_cameraMode = !m_cameraMode; // Switch between mode value
+				break;
+			case SDLK_F3: // View port standard
+				m_viewPort = STANDARD;
+				break;
+			case SDLK_F4: // View port follow ball
+				m_viewPort = FOLLOWBALL;
+				break;
+			case SDLK_F5: // View port follow ball
+				m_viewPort = PADDLE1;
+				break;
+			case SDLK_F6: // View port follow ball
+				m_viewPort = PADDLE2;
 				break;
 			}
 			break;
