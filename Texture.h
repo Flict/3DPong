@@ -7,6 +7,7 @@ using namespace std;
 class Texture
 {
 public:
+	Texture(); // Default constructor
 	Texture(const std::string& fileName);
 
 	void Bind(); // Set OpenGL up to bind texture

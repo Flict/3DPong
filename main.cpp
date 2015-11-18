@@ -13,10 +13,10 @@
 #include "Transform.h"
 #include "Camera.h"
 #include <time.h>
+#include "GameObject.h"
 
 using namespace std;
 
-std::string path = "./assets/shader"; // Path to shaders
 std::string texturePath = "./assets/bricks.bmp"; // Path to brick texture
 std::string texturePath2 = "./assets/green-texture.bmp"; // Path to green texture
 std::string texturePath3 = "./assets/background.bmp"; // Path to background texture
@@ -103,9 +103,14 @@ void HandleInput(float deltaTime, Camera camera)
 
 int main( int argc, char* args[] )
 {
+
+	
 	srand(time(NULL));
 
 	Display display(800, 600, "Hello World!");
+
+	GameObject paddle2Obj(vertexPositions1, sizeof(vertexPositions1), indicesPositions, sizeof(indicesPositions));
+	Mesh testMesh(vertexPositions1, sizeof(vertexPositions1), indicesPositions, sizeof(indicesPositions));
 	Mesh paddle2(vertexPositions1, sizeof(vertexPositions1), indicesPositions, sizeof(indicesPositions));
 	Mesh paddle1(vertexPositions1, sizeof(vertexPositions1), indicesPositions, sizeof(indicesPositions));
 	Mesh ball(vertexPositions1, sizeof(vertexPositions1), indicesPositions, sizeof(indicesPositions));
@@ -113,7 +118,7 @@ int main( int argc, char* args[] )
 	Mesh pointBlock(vertexPositions1, sizeof(vertexPositions1), indicesPositions, sizeof(indicesPositions));
 	Mesh skyBox(vertexPositions1, sizeof(vertexPositions1), indicesPositions, sizeof(indicesPositions));
 
-	Shader shader(path); //  Shader
+	//Shader shader(path); //  Shader
 	Texture texture(texturePath); // Create a texture
 	Texture texture2(texturePath2); // Create a texture
 	Texture texture3(texturePath3); // Create a texture
@@ -153,7 +158,7 @@ int main( int argc, char* args[] )
 	paddle1Transform.SetScale(glm::vec3(.05f, .3f, .1f));
 	paddle2Transform.SetScale(glm::vec3(.05f, .3f, .1f));
 	ballTransform.SetScale(glm::vec3(.05f, .075f, .075f));
-	
+	//paddle2Obj.transform = paddle1Transform;
 
 	double lastElapsedTime = SDL_GetTicks() - 1, deltaTime = 0.0f;
 	while (!display.IsWindowClosed()) /// While the window is open
@@ -198,7 +203,7 @@ int main( int argc, char* args[] )
 		}
 
 
-		background.Render(shader, paddle1Transform, renderCamera);
+		background.Draw(paddle1Transform, renderCamera);
 		
 		ballTransform.GetPos() += (ballVelocity * (float)deltaTime);
 
@@ -211,7 +216,7 @@ int main( int argc, char* args[] )
 			display.Clear(0.0f, 0.0f, 0.0f, 0.0f);
 			ballTransform.GetRot().z += 200 * deltaTime;
 			texture5.Bind();
-			skyBox.Render(shader, skyBoxTransform, renderCamera, false);
+			skyBox.Draw(skyBoxTransform, renderCamera, false);
 			glBindTexture(GL_TEXTURE_2D, 0); // No texture
 			if (!display.m_cameraMode)
 			renderCamera = perspectiveCamera;
@@ -224,18 +229,19 @@ int main( int argc, char* args[] )
 			else if (display.m_viewPort == PADDLE2)
 				renderCamera.m_view = glm::lookAt(paddle2Transform.GetPos() - glm::vec3(0.001f, 0.f, 0.f), paddle2Transform.GetPos() - glm::vec3(0.002f, 0.f, 0.f), renderCamera.m_up);
 			texture3.Bind();
-			background.Render(shader, backgroundTransform, renderCamera);
+			background.Draw(backgroundTransform, renderCamera);
 			glBindTexture(GL_TEXTURE_2D, 0); // No texture
 			texture.Bind();
-			paddle1.Render(shader, paddle1Transform, renderCamera); // Draw the mesh
+			paddle1.Draw(paddle1Transform, renderCamera); // Draw the mesh
 			glBindTexture(GL_TEXTURE_2D, 0); // No texture
 			texture6.Bind();
-			paddle2.Render(shader, paddle2Transform, renderCamera); // Draw second mesh
+			paddle2.Draw(paddle2Transform, renderCamera); // Draw second mesh
 			glBindTexture(GL_TEXTURE_2D, 0); // No texture
 			texture4.Bind();
-			ball.Render(shader, ballTransform, renderCamera);
+			ball.Draw(ballTransform, renderCamera);
 			glBindTexture(GL_TEXTURE_2D, 0); // No texture
 			texture2.Bind();
+			pointBlockTransform.SetRot(glm::vec3(sinf(value), sinf(value), sinf(value)));
 		}
 		else // orthographic projection
 		{
@@ -244,20 +250,22 @@ int main( int argc, char* args[] )
 			if (!display.m_cameraMode)
 			renderCamera = orthographicCamera;
 			glBindTexture(GL_TEXTURE_2D, 0); // No texture
-			paddle1.Render(shader, paddle1Transform, renderCamera); // Draw the mesh
-			paddle2.Render(shader, paddle2Transform, renderCamera); // Draw second mesh
-			ball.Render(shader, ballTransform, renderCamera);
+			paddle1.Draw(paddle1Transform, renderCamera); // Draw the mesh
+			paddle2.Draw(paddle2Transform, renderCamera); // Draw second mesh
+			
+			ball.Draw(ballTransform, renderCamera);
+			pointBlockTransform.SetRot(glm::vec3(0.f, 0.f, pointBlockTransform.GetRot().z + 30.f * deltaTime));
 			//texture2.Bind();
 		}
 
 		
-		pointBlockTransform.SetRot(glm::vec3(sinf(value), sinf(value), sinf(value)));
+		
 
 		for (int i = 0; i < player1Points; i++)
 		{
 			Transform temp(pointBlockTransform);
 			temp.GetPos().y = pointBlockTransform.GetPos().y - (i * 0.1f);
-			pointBlock.Render(shader, temp, orthographicCamera);
+			pointBlock.Draw(temp, orthographicCamera);
 		}
 
 		for (int i = 0; i < player2Points; i++)
@@ -265,7 +273,7 @@ int main( int argc, char* args[] )
 			Transform temp(pointBlockTransform);
 			temp.GetPos().x = -temp.GetPos().x;
 			temp.GetPos().y = pointBlockTransform.GetPos().y - (i * 0.1f);
-			pointBlock.Render(shader, temp, orthographicCamera);
+			pointBlock.Draw(temp, orthographicCamera);
 		}
 		
 		glBindTexture(GL_TEXTURE_2D, 0); // No texture
@@ -305,7 +313,9 @@ int main( int argc, char* args[] )
 		
 		//perspectiveCamera.m_pos.y += 1;
 		value += 0.01f;
-
+		paddle2Obj.m_mesh.Draw(paddle2Obj.transform, renderCamera);
+		//testMesh.Draw(paddle2Obj.transform, renderCamera);
+		
 		renderCamera.Update();
 		display.Update(deltaTime, renderCamera, paddle1Transform, paddle2Transform, paddle1Transform); // Update the display
 		

@@ -6,10 +6,11 @@
 #include "Shader.h"
 #include "Transform.h"
 #include "Camera.h"
+#include <string>
 
 
 using namespace std;
-
+const std::string defaultShader = "./assets/shader";
 
 class Mesh
 {
@@ -20,12 +21,14 @@ public:
 	virtual ~Mesh();
 	void InitializeVertexBuffer();
 	void LoadAssets();
-	void Render(Shader shader, Transform transform, Camera camera, bool cullBack = true);
+	void Draw(Transform& transform, Camera& camera, bool cullBack = true);
 	void Update(double deltaTime);
 
 	GLfloat m_vertexPositions[1000];
 	GLuint m_indicesPositions[1000];
 	GLint m_numIndices;
+
+	
 
 	GLuint m_positionBufferObject;
 	GLuint m_ebo;
@@ -37,5 +40,7 @@ public:
 	double m_offsetYSpeed = 0.2; //rate of change of offsetY in units per second
 
 private:
+	Shader* m_pShader; // Pointer to shader used for drawing
+	
 };
 

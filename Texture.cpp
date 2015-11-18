@@ -2,6 +2,11 @@
 #include "SDL.h"
 #include <iostream>
 
+Texture::Texture()
+{
+
+}
+
 Texture::Texture(const std::string& fileName)
 {
 	SDL_Surface* image = SDL_LoadBMP(fileName.c_str());

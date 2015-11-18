@@ -20,9 +20,8 @@ public:
 	GLuint m_modelTransformLocation;
 	GLuint m_textureCoord;
 	GLuint m_offsetLocation;
-	
 
-
+	Shader() {}; // Default constructor
 	Shader(string shaderPath);
 	virtual ~Shader();
 	std::string LoadShader(const std::string& fileName); // Loads shader from file
